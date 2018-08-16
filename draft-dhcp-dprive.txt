@@ -1,0 +1,392 @@
+
+
+
+
+Network Working Group                                         M. Vavrusa
+Internet-Draft                                           Cloudflare Inc.
+Intended status: Standards Track                         August 16, 2018
+Expires: February 17, 2019
+
+
+Dynamic Host Configuration Protocol (DHCP) Domain Name Server Capability
+                                 Option
+                  draft-vavrusa-net-dns-dhcp-dprive-00
+
+Abstract
+
+   This document describes Dynamic Host Configuration Protocol options
+   for passing a list of DNS recursive name server capabilities to a
+   client.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on February 17, 2019.
+
+Copyright Notice
+
+   Copyright (c) 2018 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 1]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements  . . . . . . . . . . . . . . . . . . . . . .   2
+     1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  DNS Recursive Name Server Capability option . . . . . . . . .   2
+     2.1.  The TLS_SPKI capability code  . . . . . . . . . . . . . .   3
+     2.2.  The TLS_ADN capability code . . . . . . . . . . . . . . .   4
+     2.3.  The HTTPS capability code . . . . . . . . . . . . . . . .   4
+   3.  Appearance of these options . . . . . . . . . . . . . . . . .   4
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   4
+   5.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     5.1.  DNS over TLS server offering both TLS_SPKI and TLS_ADN  .   5
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   5
+   8.  Notes . . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   5
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .   6
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
+
+1.  Introduction
+
+   This document describes an option for passing additional
+   configuration information related to Domain Name Service (DNS)
+   ([RFC1034] and [RFC1035]) in DHCPv6 ([RFC3315]).
+
+1.1.  Requirements
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [RFC2119].
+
+1.2.  Terminology
+
+   The reader is assumed to be familiar with the basic DNS concepts
+   described in [RFC1034], [RFC1035], [RFC2181] and [RFC6891].  The DNS
+   recursive name server option is defined in [RFC3646] for DHCPv6, and
+   [RFC2132] for DHCPv4.
+
+   The DHCPv6 and DHCPv4 are commonly referred to as DHCP.
+
+2.  DNS Recursive Name Server Capability option
+
+   The DNS Recursive Name Server Capability option provides a list of
+   capabilities for one or more DNS recursive name server addresses as
+   specified in the DNS Recursive Name Server option.  The order of
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 2]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+   entries corresponds to the order of name servers as per [RFC3646] or
+   [RFC2132] DNS Recursive Name Server option.
+
+   Each capability list can contain zero or more capabilities.
+
+   The format of the DNS Recursive Name Server Capability option is:
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
+                                 Figure 1
+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   option-code | option-len |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   list-count | capability-code |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   data-len | data ...  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   ...  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   option-code: OPTION_DNS_SERVER_CAPABILITIES (147)
+
+   option-len: Length of the list of DNS recursive name server
+   capabilities in octets; each capability list has a variable length.
+   list-count: Number of entries in the capability list.  capability-
+   code: Capability entry variant that defines the type of the entry.
+   data-len: Length of the capability variant data in octets.  data:
+   Optional data for the capability entry.
+
+   Legal values for the capability-code options are:
+
+                               Value   Message Type
+                               -----   ------------
+                                 1     TLS_SPKI
+                                 2     TLS_ADN
+                                 3     HTTPS
+
+                                 Figure 2
+
+2.1.  The TLS_SPKI capability code
+
+   If this option is present, the associated DNS recursive name server
+   supports [RFC7858] DNS over Transport Layer Security with SPKI key
+   pinning, as per [RFC7858], section 4.2.  The data-len MUST be set to
+   32 (length of the [RFC6234] SHA-256 hash), and the data must contain
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 3]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+   the SHA-256 hash of the DER-encoded ASN.1 representation of the SPKI
+   of an X.509 certificate.
+
+2.2.  The TLS_ADN capability code
+
+   If this option is present, the associated DNS recursive name server
+   supports [RFC7858] DNS over Transport Layer Security with ADN + IP
+   authentication, as per [RFC8310], section 6.2.  The data-len MUST bet
+   between 0 and 255, and the data must contain a [RFC1035]
+   Authentication Domain Name in wire format.
+
+2.3.  The HTTPS capability code
+
+   This capability SHOULD have data-len set to 0.  If this option is
+   present, the associated DNS recursive name server supports draft-
+   ietf-doh-dns-over-https DNS Queries over HTTPS (DoH) using [RFC5280]
+   X.509 Public Key Infrastructure (PKI) for the Internet.
+
+3.  Appearance of these options
+
+   The DNS Recursive Name Server option MUST NOT appear in any other
+   than the following messages: Solicit, Advertise, Request, Renew,
+   Rebind, Information-Request, and Reply.
+
+4.  Security Considerations
+
+   The DNS Recursive Name Server Capability option may be used by an
+   intruder DHCP server to cause DHCP clients to send DNS queries to an
+   intruder DNS recursive name server, or prevent clients from verifying
+   the authenticity of secured DNS recursive name servers.
+
+   To avoid attacks through the DNS Recursive Name Server Capability
+   option, the DHCP client SHOULD require DHCP authentication (see
+   section "Authentication of DHCP messages" in [RFC3315]) before
+   installing a list of DNS recursive name servers obtained through
+   authenticated DHCP.
+
+   Security considerations from [RFC3315], section 23 apply.
+
+   The guidelines for client use of encrypted DNS protocol capabilities
+   are described in [RFC8310].
+
+5.  Examples
+
+
+
+
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 4]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+5.1.  DNS over TLS server offering both TLS_SPKI and TLS_ADN
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
+                                 Figure 3
+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   147 | option-len |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   2 | TLS_SPKI |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   PZXN3lRAy+8tBKk2Ox6F7jIlnzr2Yzmwqc3JnyfXoCw= | | (base64 encoded for
+   posterity) | | | | | | | | | | | | |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+   TLS_ADN | \7example\3com\0 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+6.  IANA Considerations
+
+   TODO: IANA has assigned an option code to the DNS Recursive Name
+   Server Capability option (147) from the DHCPv6 option code space
+   defined in section "IANA Considerations" of [RFC3315], and from the
+   DHCPv4 option code space defined in section "Defining new extensions"
+   of [RFC2132].
+
+7.  Acknowledgements
+
+8.  Notes
+
+9.  References
+
+9.1.  Normative References
+
+   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+              <https://www.rfc-editor.org/info/rfc1034>.
+
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+   [RFC2132]  Alexander, S. and R. Droms, "DHCP Options and BOOTP Vendor
+              Extensions", RFC 2132, DOI 10.17487/RFC2132, March 1997,
+              <https://www.rfc-editor.org/info/rfc2132>.
+
+
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 5]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+   [RFC2181]  Elz, R. and R. Bush, "Clarifications to the DNS
+              Specification", RFC 2181, DOI 10.17487/RFC2181, July 1997,
+              <https://www.rfc-editor.org/info/rfc2181>.
+
+   [RFC3315]  Droms, R., Ed., Bound, J., Volz, B., Lemon, T., Perkins,
+              C., and M. Carney, "Dynamic Host Configuration Protocol
+              for IPv6 (DHCPv6)", RFC 3315, DOI 10.17487/RFC3315, July
+              2003, <https://www.rfc-editor.org/info/rfc3315>.
+
+   [RFC3646]  Droms, R., Ed., "DNS Configuration options for Dynamic
+              Host Configuration Protocol for IPv6 (DHCPv6)", RFC 3646,
+              DOI 10.17487/RFC3646, December 2003,
+              <https://www.rfc-editor.org/info/rfc3646>.
+
+   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+              <https://www.rfc-editor.org/info/rfc5280>.
+
+   [RFC6234]  Eastlake 3rd, D. and T. Hansen, "US Secure Hash Algorithms
+              (SHA and SHA-based HMAC and HKDF)", RFC 6234,
+              DOI 10.17487/RFC6234, May 2011,
+              <https://www.rfc-editor.org/info/rfc6234>.
+
+   [RFC6891]  Damas, J., Graff, M., and P. Vixie, "Extension Mechanisms
+              for DNS (EDNS(0))", STD 75, RFC 6891,
+              DOI 10.17487/RFC6891, April 2013,
+              <https://www.rfc-editor.org/info/rfc6891>.
+
+   [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
+              and P. Hoffman, "Specification for DNS over Transport
+              Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
+              2016, <https://www.rfc-editor.org/info/rfc7858>.
+
+   [RFC8310]  Dickinson, S., Gillmor, D., and T. Reddy, "Usage Profiles
+              for DNS over TLS and DNS over DTLS", RFC 8310,
+              DOI 10.17487/RFC8310, March 2018,
+              <https://www.rfc-editor.org/info/rfc8310>.
+
+9.2.  Informative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 6]
+
+Internet-Draft               dns-dhcp-dprive                 August 2018
+
+
+Author's Address
+
+   Marek Vavrusa
+   Cloudflare Inc.
+   101 Townsend St.
+   San Francisco  94107
+   USA
+
+   Email: mvavrusa@cloudflare.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vavrusa                 Expires February 17, 2019               [Page 7]
