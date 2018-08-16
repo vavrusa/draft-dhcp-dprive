@@ -57,25 +57,30 @@ The format of the DNS Recursive Name Server Capability option is:
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |          option-code          |         option-len            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |           list-count          |       capability-code         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |            data-len           |            data ...           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                              ...                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |          option-code          |         option-len            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           list-count          |       capability-code         |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |            data-len           |            data ...           |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                              ...                              |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-   option-code:               OPTION_DNS_SERVER_CAPABILITIES (147)
+    option-code:        OPTION_DNS_SERVER_CAPABILITIES (147)
 
-   option-len:                Length of the list of DNS recursive name
-                              server capabilities in octets; each capability
-                              list has a variable length.
-   list-count:                Number of entries in the capability list.
-   capability-code:           Capability entry variant that defines the type of the entry.
-   data-len:                  Length of the capability variant data in octets.
-   data:                      Optional data for the capability entry.
+    option-len:         Length of the list of DNS recursive name server
+                        capabilities in octets; each capability
+                        list has a variable length.
+
+    list-count:         Number of entries in the capability list.
+
+    capability-code:    Capability entry variant that defines the
+                        type of the entry.
+
+    data-len:           Length of the capability variant data in octets.
+
+    data:               Optional data for the capability entry.
 
 Legal values for the capability-code options are:
 
@@ -123,22 +128,27 @@ The guidelines for client use of encrypted DNS protocol capabilities are describ
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |               147             |         option-len            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                2              |          TLS_SPKI             |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |            PZXN3lRAy+8tBKk2Ox6F7jIlnzr2Yzmwqc3JnyfXoCw=       |
-   |                   (base64 encoded for posterity)              |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                TLS_ADN        |       \7example\3com\0        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | OPTION_DNS_SERVER_CAPABILITIES|          option-len           |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                2              |           TLS_SPKI            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                32             |                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+    |                                                               |
+    |                                                               |
+    |            PZXN3lRAy+8tBKk2Ox6F7jIlnzr2Yzmwqc3JnyfXoCw=       |
+    |                   (base64 encoded for posterity)              |
+    |                                                               |
+    |                                                               |
+    |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                               |            TLS_ADN            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |              13               |                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+    |                                                               |
+    |                        \7example\3com\0                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
 # IANA Considerations

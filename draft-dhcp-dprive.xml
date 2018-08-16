@@ -75,27 +75,31 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
 <figure anchor="fig-capability-option" align="center"><artwork align="center" type="ascii-art">
 0                   1                   2                   3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          option-code          |         option-len            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           list-count          |       capability-code         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            data-len           |            data ...           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                              ...                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+option-code:        OPTION_DNS_SERVER_CAPABILITIES (147)
+
+option-len:         Length of the list of DNS recursive name server
+                    capabilities in octets; each capability
+                    list has a variable length.
+
+list-count:         Number of entries in the capability list.
+
+capability-code:    Capability entry variant that defines the
+                    type of the entry.
+
+data-len:           Length of the capability variant data in octets.
+
+data:               Optional data for the capability entry.
 </artwork></figure>
-<t>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |          option-code          |         option-len            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |           list-count          |       capability-code         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |            data-len           |            data ...           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                              ...                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-</t>
-<t>option-code:               OPTION_DNS_SERVER_CAPABILITIES (147)
-</t>
-<t>option-len:                Length of the list of DNS recursive name
-                              server capabilities in octets; each capability
-                              list has a variable length.
-   list-count:                Number of entries in the capability list.
-   capability-code:           Capability entry variant that defines the type of the entry.
-   data-len:                  Length of the capability variant data in octets.
-   data:                      Optional data for the capability entry.
-</t>
 <t>Legal values for the capability-code options are:
 </t>
 
@@ -147,24 +151,28 @@ recursive name server, or prevent clients from verifying the authenticity of sec
 <figure anchor="fig-dot-example-1" align="center"><artwork align="center" type="ascii-art">
 0                   1                   2                   3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| OPTION_DNS_SERVER_CAPABILITIES|          option-len           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                2              |           TLS_SPKI            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                32             |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+|                                                               |
+|                                                               |
+|            PZXN3lRAy+8tBKk2Ox6F7jIlnzr2Yzmwqc3JnyfXoCw=       |
+|                   (base64 encoded for posterity)              |
+|                                                               |
+|                                                               |
+|                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                               |            TLS_ADN            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              13               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+|                                                               |
+|                        \7example\3com\0                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
-<t>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |               147             |         option-len            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                2              |          TLS_SPKI             |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |            PZXN3lRAy+8tBKk2Ox6F7jIlnzr2Yzmwqc3JnyfXoCw=       |
-   |                   (base64 encoded for posterity)              |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                TLS_ADN        |       \7example\3com\0        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-</t>
 </section>
 </section>
 
